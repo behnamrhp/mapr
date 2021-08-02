@@ -38,6 +38,8 @@ function controlMap(position){
 
     const _mapEl = map.mapInit(coords);
 
+    map._showOrRemoveGlobe()
+
     L.tileLayer(MAP_TYPE, { //select map type
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(_mapEl);
@@ -207,9 +209,33 @@ function controlTextareaDescription(e){
 function controlSortClickHandler(e){
     const btn = e.target.closest('.sort__btn');
     if (!btn) return;
+    //get sort type
     const sortType = btn.dataset.sort;
-    model.sortWorkouts(sortType);
+
+    //sort and get new Data
+    const sortedData = model.sortWorkouts(sortType);
+
+    //empty the workouts parent
+    form._emptyWorkouts();
+
+    //generate new sorted workouts
+    for (const work of sortedData) form._generateFormList(work);
 }
+
+/**
+ * @return zoom map to show all marker
+ */
+function controlClickShowAllWorkoutsMarker(){
+    //get all coords marker
+    const coords =model.getAllWorkoutCoords()
+
+    //modify map zoom
+
+        map.zoomToShowAllMarker(coords)
+}
+
+
+
 
 /**
  * control and introduce init functions
@@ -223,6 +249,7 @@ function init() {
     form.addRemoveEventHandler(ControlRemoveWorkout);
     form.addTextareaEventHandler(controlTextareaDescription);
     form.addEditEventHandler(controlEditWorkoutHandler);
-    sort.addClickEventHandler(controlSortClickHandler)
+    sort.addClickEventHandler(controlSortClickHandler);
+    map.addClickShowAllWorkoutsMarkerHandler(controlClickShowAllWorkoutsMarker)
 }
 init();

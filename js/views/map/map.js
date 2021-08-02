@@ -3,6 +3,11 @@ import formParent from "../forms/formParent.js";
 import MainParent from "../mainParent.js";
 
 class Map extends MainParent {
+    _globe = document.querySelector('.globe')
+    constructor() {
+        super();
+        this.initFunctions();
+    }
 
     mapInit(coordinate) {
         this._map = L.map('map').setView(coordinate, ZOOM_LEVEL_MAP);
@@ -81,6 +86,31 @@ class Map extends MainParent {
                 }
             })
         })
+    }
+
+    initFunctions(){
+        document.addEventListener('DOMContentLoaded',function (){
+            document.querySelector('.globe').addEventListener('mouseenter',function(){
+                document.querySelector('.globe_help').classList.remove('hidden');
+            })
+
+            document.querySelector('.globe').addEventListener('mouseleave',function(){
+                document.querySelector('.globe_help').classList.add('hidden');
+            })
+        })
+    }
+
+    _showOrRemoveGlobe(type='show'){
+        if (type ==='show') this._globe.classList.remove('hidden');
+        else this._globe.classList.add('hidden');
+    }
+
+    addClickShowAllWorkoutsMarkerHandler(handler){
+        this._globe.addEventListener('click', handler)
+    }
+
+    zoomToShowAllMarker(coords){
+        this._map.fitBounds(coords);
     }
 }
 

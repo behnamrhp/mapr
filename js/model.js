@@ -44,21 +44,20 @@ export function removeWorkoutData(id){
 
 export function sortWorkouts(type){
     //copy workouts array
-    const defaultArray = state.workouts.slice();
+    const sortedArr = state.workouts.slice();
 
     //sort by type and create new array
     if (type === 'distance'){
-        defaultArray.sort( (a , b)=> b.distance - a.distance)
+        sortedArr.sort( (a , b)=> a.distance - b.distance)
     }
     if (type === 'duration'){
-        defaultArray.sort( (a , b)=> b.duration - a.duration)
+        sortedArr.sort( (a , b)=> a.duration - b.duration)
     }
 
     if (type === 'date'){
-        defaultArray.forEach((curr,i,arr)=>{
-            if (i-1 < 0) return
-            const beforeDateArr = arr[i-1].date.split('-');
-            const currDateArr = curr.date.split('-');
+        sortedArr.sort( (a , b)=>{
+            const currDateArr = a.date.split('-');
+            const nextDateArr = b.date.split('-');
 
             const currYear = +currDateArr[0];
             const currMonth = +currDateArr[1];
@@ -66,24 +65,36 @@ export function sortWorkouts(type){
             const currHour = +currDateArr[2].split('T')[1].split(':')[0];
             const currMin = +currDateArr[2].split('T')[1].split(':')[1];
 
-            const beforeYear = +beforeDateArr[0];
-            const beforeMonth = +beforeDateArr[1];
-            const beforeDay = +beforeDateArr[2].split('T')[0];
-            const beforeHour = +beforeDateArr[2].split('T')[1].split(':')[0];
-            const beforeMin = +beforeDateArr[2].split('T')[1].split(':')[1];
+            const nextYear = +nextDateArr[0];
+            const nextMonth = +nextDateArr[1];
+            const nextDay = +nextDateArr[2].split('T')[0];
+            const nextHour = +nextDateArr[2].split('T')[1].split(':')[0];
+            const nextMin = +nextDateArr[2].split('T')[1].split(':')[1];
 
             //check year
+            if (currYear !== nextYear) return currYear - nextYear;
 
             //check month
+            if (currMonth !== nextMonth) return currMonth - nextMonth;
 
             //check day
+            if(currDay !== nextDay) return currDay - nextDay;
 
             //check hour
+            if (currHour !== nextHour) return currHour - nextHour;
 
             //check minutes
+            if (currMin !== nextMin)return currMin - nextMin;
+
         })
     }
 
     //return new Array
+    return sortedArr;
+}
 
+export function getAllWorkoutCoords(){
+    const coords =[]
+    state.workouts.forEach(elem => coords.push(elem.coords))
+    return coords;
 }

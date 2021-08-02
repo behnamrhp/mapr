@@ -13,6 +13,7 @@ export class formParent extends mainParent {
     _inputElevation = this._parentEl.querySelector('.form__input--elevation');
     _inputType = this._parentEl.querySelector('.form__input--type');
     _textarea = this._parentEl.querySelector('.form__input--description');
+
     _successMessage = '';
     _errorMessage = '';
     //todo: fix date and unique id
@@ -22,7 +23,7 @@ export class formParent extends mainParent {
     _setDescription() {
         // prettier-ignore
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDay()}`
+        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} on ${months[this.date.getMonth()]} ${+this.date.getDay()+1}`
     }
 
     showForm(e, updateCheck = 'false') {
@@ -194,6 +195,13 @@ export class formParent extends mainParent {
         this._textarea.value = '';
     }
 
+    _emptyWorkouts(){
+        const allFormChildren =Array.from(this._containerWorkouts.children);
+        allFormChildren.forEach(w => {
+            if(w.classList.contains('form')) return;
+            w.remove();
+        })
+    }
 }
 
 export default new formParent
