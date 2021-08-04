@@ -1,10 +1,12 @@
-import {ZOOM_LEVEL_MAP} from "../../config.js";
+import {ZOOM_LEVEL_MAP, FINISH_ICON_MARKER} from "../../config.js";
 import formParent from "../forms/formParent.js";
 import MainParent from "../mainParent.js";
+import {get_popup} from "../../helper.js";
 
 class Map extends MainParent {
     _globe = document.querySelector('.globe');
     _finishMarkerCheck = false;
+    _errorMessage='';
     _cancelFinishMarkerBtn = document.querySelector('.cancel__finishMarker');
     constructor() {
         super();
@@ -26,15 +28,12 @@ class Map extends MainParent {
     }
 
     renderWorkoutMarker(workout) {
-        L.marker(workout.coords, {alt: workout.id}).addTo(this._map)
-            .bindPopup(L.popup({
-                maxWidth: 250,
-                maxHeight: 100,
-                autoClose: false,
-                className: `${workout.type}-popup`,
-                closeOnEscapeKey: false,
-                closeOnClick: false
-            }))
+
+        L.marker(this._finishMarkerCheck? workout.finishCoords : workout.coords, {
+            alt: workout.id,
+        ...(this._finishMarkerCheck && {icon: FINISH_ICON_MARKER})
+        }).addTo(this._map)
+            .bindPopup(get_popup(workout.type))
             .setPopupContent(workout.marker_description)
             .openPopup();
 

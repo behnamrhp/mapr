@@ -15,6 +15,7 @@ import running from "./views/forms/running.js";
 import cycling from "./views/forms/cycling.js";
 import {updateWorkoutData} from "./model.js";
 import sort from './views/sort.js'
+import {get_line} from './helper.js'
 
 /**
  *
@@ -33,7 +34,7 @@ function ControlMapInitData() {
  * @param {Object} position get position from init ControlMapInitData and control render map and settings main map
  * @author behnam_rahimpour
  */
-function controlMap(position){
+function controlMap(position) {
     const coords = model.getPoseFromApi(position);
 
     const _mapEl = map.mapInit(coords);
@@ -44,13 +45,12 @@ function controlMap(position){
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(_mapEl);
 
-    map.addClickMapHandler(form.showForm.bind(form))
+    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
 
-    for(const work of model.state.workouts){
+    for (const work of model.state.workouts) {
         map.renderWorkoutMarker(work);
     }
 
-    console.log(model.state.workouts)
 }
 
 
@@ -58,9 +58,9 @@ function controlMap(position){
 /**
  * control workout list init and settings
  */
-function controlWorkoutInit(){
-   model.getLocalStorage();
-    for(const work of model.state.workouts) {
+function controlWorkoutInit() {
+    model.getLocalStorage();
+    for (const work of model.state.workouts) {
         formParent._generateFormList(work);
     }
 }
@@ -70,13 +70,13 @@ function controlWorkoutInit(){
  * @return submit form controller
  * @param {Object} e
  */
-function controlFormSubmit(e){
+function controlFormSubmit(e) {
     e.preventDefault();
-    const workout = form._formGetValues((this.dataset.editMode === 'false'? 'false':'true'));
+    const workout = form._formGetValues((this.dataset.editMode === 'false' ? 'false' : 'true'));
     if (workout.type === 'running') workout.pace = running._calcPace.call(form);
     else workout.speed = cycling._calcSpeed.call(form)
 
-    if (!this.dataset.editMode || this.dataset.editMode === 'false'){//add workout submit mode
+    if (!this.dataset.editMode || this.dataset.editMode === 'false') {//add workout submit mode
         // add new object to workout array
         model.state.workouts.push(workout);
 
@@ -91,22 +91,22 @@ function controlFormSubmit(e){
 
         form._hideForm();
 
-    }else{ //update submit mode
+    } else { //update submit mode
 
         //create new workout Div
 
-        const newHtml =form._generateFormList(workout,true);
+        const newHtml = form._generateFormList(workout, true);
 
         //get old element
         const oldWorkout = form.getWorkout(workout.id);
 
         //update element function
-         form.updateDom(oldWorkout,newHtml)
+        form.updateDom(oldWorkout, newHtml)
 
         //get workout coords
-        workout.coords =model.getWorkoutData(workout.id).coords;
+        workout.coords = model.getWorkoutData(workout.id).coords;
         //update marker description
-         map._getAllMarkerDataAndEdit(workout);
+        map._getAllMarkerDataAndEdit(workout);
 
         //update localstorage
         // model.updateWorkoutData(workout)
@@ -118,6 +118,8 @@ function controlFormSubmit(e){
         form._hideForm();
     }
 
+    form._data = workout;
+
     //choose finish marker dialog
     form._formEmptyInputs();
     map._question = 'are you willing to set finish workout marker';
@@ -127,40 +129,66 @@ function controlFormSubmit(e){
     map.addClickFinishMarkerEvent(controlSetFinishMarker)
 }
 
-function controlSetFinishMarker(e){
-    console.log(e);
+
+function controlSetFinishMarker(e) {
     //select btn type
     const btn = e.target.closest('.btn');
     if (!btn) return;
 
     //hide dialog
-    map._hideAndShowElem(map._errorElem,'hide');
+    map._hideAndShowElem(map._errorElem, 'hide');
 
     //cancel finish marker
-    if(btn.getAttribute('id') === 'cancel') return;
+    if (btn.getAttribute('id') === 'cancel') return;
 
     //add cancel set finish marker
-    map._hideAndShowElem(map._cancelFinishMarkerBtn,'show');
+    map._hideAndShowElem(map._cancelFinishMarkerBtn, 'show');
 
     //set global variable to true
     map._finishMarkerCheck = true;
 
     //add finish icon
-
-    //set finish coords to localstorage
-
-    //add lines between two marker
-
-}
-
-function drawLineBetweenMarkers(coo1, coo2){
+    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
 
 }
 
 /**
+ * @return add finish marker and draw line between two marker
+ * @param e {Object} event of click handle of click on map
+ */
+function controlAddFinishMarker(e) {
+    if (!map._finishMarkerCheck) return;
+    map._mapEvent = e;
+    const {lat, lng} = this._mapEvent.latlng;
+
+    form._data.finishCoords = [lat, lng];
+
+    //render finish icon on map
+    map.renderWorkoutMarker(form._data)
+
+    //get two lines
+    const points = [form._data.coords, form._data.finishCoords];
+
+    //add lines between two marker
+    const line = get_line(points);
+    line.addTo(map._map);
+
+    //set finish coords to localstorage
+
+
+    //set global check variable to default
+    map._finishMarkerCheck = false;
+    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
+
+    //remove cancel finish marker button
+    map._hideAndShowElem(map._cancelFinishMarkerBtn,'hide');
+}
+
+
+/**
  * @return toggle between input of cycle and run
  */
-function controlChangeInputHandler(){
+function controlChangeInputHandler() {
     form._inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
     form._inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
 }
@@ -169,14 +197,14 @@ function controlChangeInputHandler(){
  * @return control click handle on every workout list to move map on specific workout marker
  * @param {Object} e
  */
-function controlClickWorkoutHandler(e){
+function controlClickWorkoutHandler(e) {
     const workoutEl = e.target.closest('.workout');
     const icons = e.target.closest('.workout__icons')
     if (!workoutEl || icons) return;
-    const workout = model.state.workouts.find((work)=> work.id === +workoutEl.dataset.id);
-    map._map.setView(workout.coords, ZOOM_LEVEL_MAP,{
-        animate:true,
-        pan:{
+    const workout = model.state.workouts.find((work) => work.id === +workoutEl.dataset.id);
+    map._map.setView(workout.coords, ZOOM_LEVEL_MAP, {
+        animate: true,
+        pan: {
             duration: 1
         }
     })
@@ -186,11 +214,11 @@ function controlClickWorkoutHandler(e){
  *  @return remove workout from list and map and localstorage
  * @param {Object} e object of event to stop propagation
  */
-function ControlRemoveWorkout(e){
+function ControlRemoveWorkout(e) {
     const btn = e.target.closest('.workout__remove');
     if (!btn) return;
     e.stopPropagation();
-    const workout =btn.parentElement
+    const workout = btn.parentElement
     const workout_id = +workout.dataset.id
     workout.remove();//remove from dom
     map._getAllMarkerDataAndRemove(model.getWorkoutData(workout_id))//remove from map
@@ -204,21 +232,21 @@ function ControlRemoveWorkout(e){
 
 }
 
-function controlEditWorkoutHandler(e){
+function controlEditWorkoutHandler(e) {
     const btn = e.target.closest('.workout__edit');
     if (!btn) return;
     e.stopPropagation();
-    const workout =btn.parentElement;
+    const workout = btn.parentElement;
     const workout_id = +workout.dataset.id;
-    form.showForm('_',true);
-    form._parentEl.dataset.editMode = ''+workout_id;
+    form.showForm('_', true);
+    form._parentEl.dataset.editMode = '' + workout_id;
 }
 
 
 /**
  * @return remove all data from localstorage and restart the app
  */
-function reset_all_data(){
+function reset_all_data() {
     localStorage.removeItem('workout');
     location.reload();
 }
@@ -227,23 +255,23 @@ function reset_all_data(){
  * @return avoid press enter key and length check
  * @param {Object} e data of event of keydown on description form
  */
-function controlTextareaDescription(e){
-    if (e.key ==='Enter'){
-        e.returnValue=false;
+function controlTextareaDescription(e) {
+    if (e.key === 'Enter') {
+        e.returnValue = false;
         form._inputDistance.focus()
     }
-    if (e.target.value.length >= DESCRIPTION_LENGTH_VALID){
-        e.returnValue= false;
+    if (e.target.value.length >= DESCRIPTION_LENGTH_VALID) {
+        e.returnValue = false;
         form._inputDistance.focus()
 
-        this.removeEventListener('keydown',controlTextareaDescription);
+        this.removeEventListener('keydown', controlTextareaDescription);
     }
 }
 
 /**
  * @return sort the workouts on click sort btn
  */
-function controlSortClickHandler(e){
+function controlSortClickHandler(e) {
     const btn = e.target.closest('.sort__btn');
     if (!btn) return;
     //get sort type
@@ -262,22 +290,23 @@ function controlSortClickHandler(e){
 /**
  * @return zoom map to show all marker
  */
-function controlClickShowAllWorkoutsMarker(){
+function controlClickShowAllWorkoutsMarker() {
     //get all coords marker
-    const coords =model.getAllWorkoutCoords()
+    const coords = model.getAllWorkoutCoords()
 
     //modify map zoom
 
-        map.zoomToShowAllMarker(coords)
+    map.zoomToShowAllMarker(coords)
 }
 
 /**
  * @return hide and cancel the set finish marker
  * @param e {Object} event handler of click
  */
-function controlAddClickCancelFinishMarkerWorkoutHandler(e){
-    map._hideAndShowElem(e.target,'hide');
+function controlAddClickCancelFinishMarkerWorkoutHandler(e) {
+    map._hideAndShowElem(e.target, 'hide');
     map._finishMarkerCheck = false;
+    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
 }
 
 /**
@@ -296,4 +325,5 @@ function init() {
     map.addClickShowAllWorkoutsMarkerHandler(controlClickShowAllWorkoutsMarker);
     map.addClickCancelFinishMarkerWorkoutEvent(controlAddClickCancelFinishMarkerWorkoutHandler)
 }
+
 init();

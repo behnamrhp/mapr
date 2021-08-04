@@ -1,6 +1,7 @@
 import mainParent from "../mainParent.js";
 import {check_positive_numbers, check_valid_numbers} from "../../helper.js";
-import {REMOVE_SUCCESS_MESSAGE ,ERROR_INVALID_INPUT} from '../../config.js'
+import {REMOVE_SUCCESS_MESSAGE, ERROR_INVALID_INPUT} from '../../config.js'
+
 // import { v4 as uuidv4 } from 'uuid';
 
 
@@ -23,13 +24,12 @@ export class formParent extends mainParent {
     _setDescription() {
         // prettier-ignore
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} on ${months[this.date.getMonth()]} ${+this.date.getDay()+1}`
+        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} on ${months[this.date.getMonth()]} ${+this.date.getDay() + 1}`
     }
 
     showForm(e, updateCheck = 'false') {
 
         this._parentEl.classList.remove('hidden');
-        this._inputDistance.focus();
 
         if (!updateCheck || updateCheck === 'false') {
 
@@ -37,6 +37,7 @@ export class formParent extends mainParent {
 
             this._parentEl.dataset.editMode = 'false'
         }
+        setTimeout(() => this._inputDistance.focus(), 500)
     }
 
     addEventFomSubmitHandler(handler) {
@@ -60,7 +61,7 @@ export class formParent extends mainParent {
             date: this.date.toISOString(),
             marker_description: (marker_description) ? marker_description : 'workout'
         }
-        if (this._mapEvent && this._mapEvent.latlng){
+        if (this._mapEvent && this._mapEvent.latlng) {
             const {lat, lng} = this._mapEvent.latlng;
 
             this._data.coords = [lat, lng];
@@ -100,7 +101,7 @@ export class formParent extends mainParent {
         }
 
 
-        if (updateCheck !== 'false'){
+        if (updateCheck !== 'false') {
             this._data.id = +this._parentEl.dataset.editMode;
             return this._data; //return to update only workout data
         }
@@ -179,15 +180,15 @@ export class formParent extends mainParent {
     }
 
     getWorkout(id) {
-        const workout =  this._containerWorkouts.querySelectorAll('.workout')
+        const workout = this._containerWorkouts.querySelectorAll('.workout')
 
-        for (let  i =0 ; i < workout.length; i++){
+        for (let i = 0; i < workout.length; i++) {
             if (+workout[i].dataset.id === +id) return workout[i]
         }
 
     }
 
-    _formEmptyInputs(){
+    _formEmptyInputs() {
         this._inputDistance.value = '';
         this._inputDuration.value = '';
         this._inputCadence.value = '';
@@ -195,10 +196,10 @@ export class formParent extends mainParent {
         this._textarea.value = '';
     }
 
-    _emptyWorkouts(){
-        const allFormChildren =Array.from(this._containerWorkouts.children);
+    _emptyWorkouts() {
+        const allFormChildren = Array.from(this._containerWorkouts.children);
         allFormChildren.forEach(w => {
-            if(w.classList.contains('form')) return;
+            if (w.classList.contains('form')) return;
             w.remove();
         })
     }

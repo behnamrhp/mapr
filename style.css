@@ -268,7 +268,7 @@ a:visited {
     height: auto;
     min-height: 5rem;
     max-width: 70vw;
-    background: #dcdcdc;
+    background: #fff;
     color: var(--color-dark--2);
     display: grid;
     border-radius: 7px;
