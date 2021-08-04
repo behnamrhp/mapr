@@ -3,7 +3,9 @@ import formParent from "../forms/formParent.js";
 import MainParent from "../mainParent.js";
 
 class Map extends MainParent {
-    _globe = document.querySelector('.globe')
+    _globe = document.querySelector('.globe');
+    _finishMarkerCheck = false;
+    _cancelFinishMarkerBtn = document.querySelector('.cancel__finishMarker');
     constructor() {
         super();
         this.initFunctions();
@@ -111,6 +113,14 @@ class Map extends MainParent {
 
     zoomToShowAllMarker(coords){
         this._map.fitBounds(coords);
+    }
+
+    addClickFinishMarkerEvent(handler){
+        this._errorElem.addEventListener('click',handler)
+    }
+
+    addClickCancelFinishMarkerWorkoutEvent(handler){
+        this._cancelFinishMarkerBtn.addEventListener('click', handler)
     }
 }
 

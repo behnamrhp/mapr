@@ -8,11 +8,10 @@ export default class MainParent {
     _errorMessage = '';
     _successMessage = '';
     _errorElem = document.querySelector('.messages');
-
+    _question ='';
 
 
     updateDom(oldElem, newElemString) {
-        console.log(oldElem)
         const newDom = document.createRange().createContextualFragment(newElemString);
         const newDomArr = Array.from(newDom.querySelectorAll('*')).slice(1);
         const currDomArr = Array.from(oldElem.querySelectorAll('*'));
@@ -36,7 +35,7 @@ export default class MainParent {
         })
     }
 
-    _alertRender(type = 'error') {
+   async _alertRender(type = 'error') {
         let html;
         if (type === 'error'){
             this._errorElem.className = 'messages messages__border-error';
@@ -44,13 +43,20 @@ export default class MainParent {
             this._errorElem.innerHTML = html
 
         }
-        else {
+        else if(type === 'success') {
             this._errorElem.className = 'messages messages__border-success';
              html = this._generateSuccessAlert()
             this._errorElem.innerHTML = html
         }
+        else if(type === 'question'){
+            this._errorElem.className = 'messages messages__border-msg';
+            html = this._generateQuestionAlert();
+            this._errorElem.innerHTML = html;
+        }
 
-        hide_after_seconds(HIDE_MESSAGES_TIMEOUT,this._errorElem);
+     if(type !== 'question'){
+         await hide_after_seconds(HIDE_MESSAGES_TIMEOUT,this._errorElem);
+     }
 
     }
 
@@ -68,6 +74,26 @@ export default class MainParent {
     <div class="messages__type messages__success">Susccess</div>
     <div class="messages__description">${this._successMessage}</div>
         `
+    }
+
+    _generateQuestionAlert(){
+        return `
+        <i class="fas fa-check messages__icon messages__msg"></i>
+    <div class="messages__type messages__msg">message</div>
+    <div class="messages__description">${this._question}</div>
+    <div class="btn__container">
+        <a href="javascript:void(0)" class="btn btn--agree" id="agree">yes</a>
+    <a href="javascript:void(0)" class="btn btn--cancel" id="cancel">no</a>
+</div>
+        `
+    }
+
+    _hideAndShowElem(elem,type){
+        if (type === 'hide'){
+            elem.classList.add('hidden')
+        }else{
+            elem.classList.remove('hidden')
+        }
     }
 }
 

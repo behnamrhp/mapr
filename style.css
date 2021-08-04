@@ -292,6 +292,10 @@ a:visited {
     border-bottom: 3px solid #cd0f0f;
 }
 
+.messages__border-msg{
+    border-bottom: 3px solid #0078A8;
+}
+
 .messages__icon {
     grid-column: icon-start/ icon-end;
     grid-row: 1/2;
@@ -306,6 +310,54 @@ a:visited {
     font-size: 2rem;
     font-weight: bold;
 }
+.btn__container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+.btn {
+    width: 5rem;
+    padding: 1rem;
+    color: #2d3439 !important;
+    border: 1px solid #2d3439;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 1.5rem;
+    margin: 1rem 1rem 0 0;
+    transition: all .2s;
+    border-radius: 6px;
+}
+
+.btn--cancel:hover {
+    background: #cd0f0f;
+    color: #fff !important;
+    border:1px solid transparent;
+}
+
+.btn--agree:hover {
+    background: #00c46a;
+    color: #fff !important;
+    border:1px solid transparent;
+}
+
+.cancel__finishMarker {
+    text-decoration: none;
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    color: #2d3439 !important;
+    box-shadow: 0 2px 2px #0000003b;
+    transition: all .2s linear;
+    z-index: 11111111;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border: 1px solid #2d3439;
+    padding: 1rem;
+    border-radius: 7px;
+    background: #b5b4b40d;
+    backdrop-filter: blur(10px);
+}
 
 .messages__error {
     color: #cd0f0f;
@@ -313,6 +365,10 @@ a:visited {
 
 .messages__success {
     color: #00c46a;
+}
+
+.messages__msg{
+    color: #0078A8;
 }
 
 .messages__description {
@@ -399,7 +455,7 @@ a:visited {
     clip-path: polygon(100% 0, 0 0, 100% 100%);
 }
 .globe>svg:hover {
-    animation: rotation 1s linear 0s infinite;
+    animation: rotation 1s linear 0s;
 }
 .globe svg path {
     stroke: #0078A8;

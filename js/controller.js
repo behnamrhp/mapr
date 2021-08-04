@@ -49,6 +49,8 @@ function controlMap(position){
     for(const work of model.state.workouts){
         map.renderWorkoutMarker(work);
     }
+
+    console.log(model.state.workouts)
 }
 
 
@@ -77,16 +79,15 @@ function controlFormSubmit(e){
     if (!this.dataset.editMode || this.dataset.editMode === 'false'){//add workout submit mode
         // add new object to workout array
         model.state.workouts.push(workout);
-        console.log()
+
         // save to local storage
-        model.setLocalStorage();
+        // model.setLocalStorage();
 
         // render workout on the map and list
         map.renderWorkoutMarker(workout);
         form._generateFormList(workout);
         //show message
         form._successMessage = CREATE_SUCCESS_MESSAGE;
-        form._alertRender('success')
 
         form._hideForm();
 
@@ -108,16 +109,52 @@ function controlFormSubmit(e){
          map._getAllMarkerDataAndEdit(workout);
 
         //update localstorage
-        model.updateWorkoutData(workout)
+        // model.updateWorkoutData(workout)
 
         //show message
         form._successMessage = UPDATE_SUCCESS_MESSAGE;
-        form._alertRender('success')
 
         //hide form
         form._hideForm();
     }
+
+    //choose finish marker dialog
     form._formEmptyInputs();
+    map._question = 'are you willing to set finish workout marker';
+    map._alertRender('question');
+
+    //read set finish function controller
+    map.addClickFinishMarkerEvent(controlSetFinishMarker)
+}
+
+function controlSetFinishMarker(e){
+    console.log(e);
+    //select btn type
+    const btn = e.target.closest('.btn');
+    if (!btn) return;
+
+    //hide dialog
+    map._hideAndShowElem(map._errorElem,'hide');
+
+    //cancel finish marker
+    if(btn.getAttribute('id') === 'cancel') return;
+
+    //add cancel set finish marker
+    map._hideAndShowElem(map._cancelFinishMarkerBtn,'show');
+
+    //set global variable to true
+    map._finishMarkerCheck = true;
+
+    //add finish icon
+
+    //set finish coords to localstorage
+
+    //add lines between two marker
+
+}
+
+function drawLineBetweenMarkers(coo1, coo2){
+
 }
 
 /**
@@ -234,8 +271,14 @@ function controlClickShowAllWorkoutsMarker(){
         map.zoomToShowAllMarker(coords)
 }
 
-
-
+/**
+ * @return hide and cancel the set finish marker
+ * @param e {Object} event handler of click
+ */
+function controlAddClickCancelFinishMarkerWorkoutHandler(e){
+    map._hideAndShowElem(e.target,'hide');
+    map._finishMarkerCheck = false;
+}
 
 /**
  * control and introduce init functions
@@ -250,6 +293,7 @@ function init() {
     form.addTextareaEventHandler(controlTextareaDescription);
     form.addEditEventHandler(controlEditWorkoutHandler);
     sort.addClickEventHandler(controlSortClickHandler);
-    map.addClickShowAllWorkoutsMarkerHandler(controlClickShowAllWorkoutsMarker)
+    map.addClickShowAllWorkoutsMarkerHandler(controlClickShowAllWorkoutsMarker);
+    map.addClickCancelFinishMarkerWorkoutEvent(controlAddClickCancelFinishMarkerWorkoutHandler)
 }
 init();
