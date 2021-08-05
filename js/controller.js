@@ -7,7 +7,7 @@ import {
     DESCRIPTION_LENGTH_VALID,
     UPDATE_SUCCESS_MESSAGE,
     REMOVE_SUCCESS_MESSAGE,
-    CREATE_SUCCESS_MESSAGE
+    CREATE_SUCCESS_MESSAGE,
 } from "./config.js";
 import form from "./views/forms/formParent.js"
 import formParent from "./views/forms/formParent.js";
@@ -25,8 +25,9 @@ import {get_line} from './helper.js'
  */
 function ControlMapInitData() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(controlMap, map._renderError)//navigator api and map functions
+        navigator.geolocation.getCurrentPosition(controlMap, map._renderError.bind(map))//navigator api and map functions
     }
+
 }
 
 /**
@@ -56,7 +57,7 @@ function controlMap(position) {
         if (work.finishCoords) {
             map._finishMarkerCheck = true
             map.renderWorkoutMarker(work);
-            const line = get_line([work.coords,work.finishCoords]);
+            const line = get_line([work.coords, work.finishCoords]);
             line.addTo(map._map);
             map._finishMarkerCheck = false
         }
@@ -70,11 +71,14 @@ function controlMap(position) {
 /**
  * control workout list init and settings
  */
-function controlWorkoutInit() {
+async function controlWorkoutInit() {
     model.getLocalStorage();
     for (const work of model.state.workouts) {
+        if (work.weather_id) form._weatherId = work.weather_id;//check for weather data
         formParent._generateFormList(work);
+        form._weatherId = false;
     }
+
 }
 
 
@@ -82,13 +86,32 @@ function controlWorkoutInit() {
  * @return submit form controller
  * @param {Object} e
  */
-function controlFormSubmit(e) {
+async function controlFormSubmit(e) {
     e.preventDefault();
+    if (form._isSubmit) return;
+    form._isSubmit = true;
+
     const workout = form._formGetValues((this.dataset.editMode === 'false' ? 'false' : 'true'));
+    if (!workout) return
+
+
     if (workout.type === 'running') workout.pace = running._calcPace.call(form);
     else workout.speed = cycling._calcSpeed.call(form)
 
     if (!this.dataset.editMode || this.dataset.editMode === 'false') {//add workout submit mode
+        //set workout description
+        const dataLocation = await model.getLocationReverseData(workout);
+        form._data.description = form._setDescription(dataLocation);//set description
+        workout.description = form._data.description;
+
+        //get weather workout and save
+        const weatherId = await model.getWeatherData(workout);
+        if(weatherId){
+            form._weatherId = weatherId;
+            workout.weather_id = weatherId;
+        }
+        else form._weatherId =false;
+
         // add new object to workout array
         model.state.workouts.push(workout);
 
@@ -101,6 +124,11 @@ function controlFormSubmit(e) {
         //show message
         form._successMessage = CREATE_SUCCESS_MESSAGE;
 
+        map._question = 'are you willing to set finish workout marker';
+        map._alertRender('question');
+
+        //read set finish function controller
+        map.addClickFinishMarkerEvent(controlSetFinishMarker)
         form._hideForm();
 
     } else { //update submit mode
@@ -134,11 +162,7 @@ function controlFormSubmit(e) {
 
     //choose finish marker dialog
     form._formEmptyInputs();
-    map._question = 'are you willing to set finish workout marker';
-    map._alertRender('question');
-
-    //read set finish function controller
-    map.addClickFinishMarkerEvent(controlSetFinishMarker)
+    form._isSubmit = false;
 }
 
 
@@ -161,6 +185,7 @@ function controlSetFinishMarker(e) {
 
     //add finish icon
     map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
+
 
 }
 
@@ -296,7 +321,11 @@ function controlSortClickHandler(e) {
     form._emptyWorkouts();
 
     //generate new sorted workouts
-    for (const work of sortedData) form._generateFormList(work);
+    for (const work of sortedData){
+        if (work.weather_id) form._weatherId = work.weather_id;//check for weather data
+        form._generateFormList(work);
+        form._weatherId = false;
+    }
 }
 
 /**
@@ -322,7 +351,7 @@ function controlAddClickCancelFinishMarkerWorkoutHandler(e) {
 }
 
 /**
- * control and introduce init functions
+ * @return control and introduce init functions
  */
 function init() {
     ControlMapInitData();

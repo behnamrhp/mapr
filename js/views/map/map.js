@@ -6,7 +6,6 @@ import {get_popup} from "../../helper.js";
 class Map extends MainParent {
     _globe = document.querySelector('.globe');
     _finishMarkerCheck = false;
-    _errorMessage='';
     _cancelFinishMarkerBtn = document.querySelector('.cancel__finishMarker');
     constructor() {
         super();

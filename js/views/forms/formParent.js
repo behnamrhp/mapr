@@ -1,6 +1,6 @@
 import mainParent from "../mainParent.js";
 import {check_positive_numbers, check_valid_numbers} from "../../helper.js";
-import {REMOVE_SUCCESS_MESSAGE, ERROR_INVALID_INPUT} from '../../config.js'
+import {REMOVE_SUCCESS_MESSAGE, ERROR_INVALID_INPUT, WEATHERS} from '../../config.js'
 
 // import { v4 as uuidv4 } from 'uuid';
 
@@ -14,6 +14,7 @@ export class formParent extends mainParent {
     _inputElevation = this._parentEl.querySelector('.form__input--elevation');
     _inputType = this._parentEl.querySelector('.form__input--type');
     _textarea = this._parentEl.querySelector('.form__input--description');
+    _isSubmit = false;
 
     _successMessage = '';
     _errorMessage = '';
@@ -21,10 +22,18 @@ export class formParent extends mainParent {
     date = new Date();
     id = Date.now();
 
-    _setDescription() {
+    _renderLocationDetails(location){
+        let html='';
+     if(location.adminArea3 !== '') html += location.adminArea3+', ';
+     if(location.adminArea4 !== '')html += location.adminArea4+', ';
+     if(location.adminArea5 !== '')html += location.adminArea5+', ';
+     if(location.street !== '')html += location.street+ ' ';
+     return html
+    }
+    _setDescription(location) {
         // prettier-ignore
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} on ${months[this.date.getMonth()]} ${+this.date.getDay() + 1}`
+        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} ${(location)? 'in '+this._renderLocationDetails(location.results[0].locations[0])  : ''} on ${months[this.date.getMonth()]} ${+this.date.getDay() + 1}`
     }
 
     showForm(e, updateCheck = 'false') {
@@ -63,12 +72,11 @@ export class formParent extends mainParent {
         }
         if (this._mapEvent && this._mapEvent.latlng) {
             const {lat, lng} = this._mapEvent.latlng;
-
+            console.log(this._mapEvent)
             this._data.coords = [lat, lng];
             this._data.id = new Date().getTime();
         }
 
-        this._data.description = this._setDescription();//set description
 
 
         // this._data.id = uuidv4();
@@ -81,8 +89,10 @@ export class formParent extends mainParent {
                 !check_valid_numbers(distance, duration, cadence) ||
                 !check_positive_numbers(distance, duration, cadence)
             ) {
-                this._errorMessage = ERROR_INVALID_INPUT
-                return this._alertRender('error');
+                this._errorMessage = ERROR_INVALID_INPUT;
+                this._isSubmit = false;
+                 this._alertRender('error');
+                 return false;
             }
             this._data.cadence = cadence;
         }
@@ -94,8 +104,11 @@ export class formParent extends mainParent {
                 !check_valid_numbers(distance, duration, elevation) ||
                 !check_positive_numbers(distance, duration)
             ) {
-                this._errorMessage = ERROR_INVALID_INPUT
-                return this._alertRender('error');
+                this._errorMessage = ERROR_INVALID_INPUT;
+                this._isSubmit = false;
+                this._alertRender('error');
+                return false;
+
             }
             this._data.elevation = elevation;
         }
@@ -129,12 +142,26 @@ export class formParent extends mainParent {
             `
     }
 
+    _generateWeather(){
+        if(this._weatherId >= 200 && this._weatherId <= 232 ) return WEATHERS.thunder
+        if (this._weatherId >= 300 && this._weatherId <= 321) return WEATHERS.drizzle
+        if (this._weatherId >= 500 && this._weatherId <= 531) return WEATHERS.rainy
+        if (this._weatherId >= 600 && this._weatherId <= 622) return WEATHERS.snowy
+        if (this._weatherId >= 701 && this._weatherId <= 781) return WEATHERS.atmosphere
+        if (this._weatherId === 800) return WEATHERS.clear
+        if (this._weatherId >= 801 && this._weatherId <= 900) return WEATHERS.cloud
+        else return ''
+    }
+
     _generateFormList(workout, updateCheck = false) {
 
         let html = `<li class="workout workout--${workout.type}" data-id="${workout.id}">
            <i class="far fa-map-marker-times workout__remove workout__icons"></i>
-            <i class="far fa-map-marker-edit workout__edit workout__icons"></i>
-          <h2 class="workout__title">${workout.description}</h2>
+            <i class="far fa-map-marker-edit workout__edit workout__icons"></i>`
+
+        if (this._weatherId) html += `<span class="workout__weather">${this._generateWeather()}</span>`;
+
+        html += `<h2 class="workout__title" ${this._weatherId? 'style=margin-left:.8rem' :''}>${workout.description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${workout.type === 'running' ? '🏃' : '‍♂'}</span>
             <span class="workout__value">${workout.distance}</span>
@@ -153,6 +180,7 @@ export class formParent extends mainParent {
         if (workout.type === 'cycling') {
             html += this._generateCyclingWorkout(workout);
         }
+
         if (updateCheck) return html;
         this._parentEl.insertAdjacentHTML('afterend', html);
     }

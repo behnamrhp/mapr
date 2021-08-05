@@ -9,7 +9,7 @@ export default class MainParent {
     _successMessage = '';
     _errorElem = document.querySelector('.messages');
     _question ='';
-
+    _weatherId;
 
     updateDom(oldElem, newElemString) {
         const newDom = document.createRange().createContextualFragment(newElemString);
