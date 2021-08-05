@@ -95,6 +95,9 @@ export function sortWorkouts(type){
 
 export function getAllWorkoutCoords(){
     const coords =[]
-    state.workouts.forEach(elem => coords.push(elem.coords))
+    state.workouts.forEach(elem =>{
+        coords.push(elem.coords)
+        if (elem.finishCoords) coords.push(elem.finishCoords);
+    })
     return coords;
 }

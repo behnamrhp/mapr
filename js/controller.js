@@ -45,14 +45,26 @@ function controlMap(position) {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(_mapEl);
 
-    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
 
+    //add main marker
     for (const work of model.state.workouts) {
         map.renderWorkoutMarker(work);
     }
 
-}
+    //add finish marker and line
+    for (const work of model.state.workouts) {
+        if (work.finishCoords) {
+            map._finishMarkerCheck = true
+            map.renderWorkoutMarker(work);
+            const line = get_line([work.coords,work.finishCoords]);
+            line.addTo(map._map);
+            map._finishMarkerCheck = false
+        }
+    }
 
+    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
+
+}
 
 
 /**
@@ -81,7 +93,7 @@ function controlFormSubmit(e) {
         model.state.workouts.push(workout);
 
         // save to local storage
-        // model.setLocalStorage();
+        model.setLocalStorage();
 
         // render workout on the map and list
         map.renderWorkoutMarker(workout);
@@ -109,7 +121,7 @@ function controlFormSubmit(e) {
         map._getAllMarkerDataAndEdit(workout);
 
         //update localstorage
-        // model.updateWorkoutData(workout)
+        model.updateWorkoutData(workout)
 
         //show message
         form._successMessage = UPDATE_SUCCESS_MESSAGE;
@@ -174,14 +186,14 @@ function controlAddFinishMarker(e) {
     line.addTo(map._map);
 
     //set finish coords to localstorage
-
+    model.updateWorkoutData(form._data);
 
     //set global check variable to default
     map._finishMarkerCheck = false;
     map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
 
     //remove cancel finish marker button
-    map._hideAndShowElem(map._cancelFinishMarkerBtn,'hide');
+    map._hideAndShowElem(map._cancelFinishMarkerBtn, 'hide');
 }
 
 
