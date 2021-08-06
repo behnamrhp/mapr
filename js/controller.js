@@ -133,8 +133,10 @@ async function controlFormSubmit(e) {
 
     } else { //update submit mode
 
-        //create new workout Div
+        //get new workout description
+        workout.description = model.getWorkoutData(workout.id).description;
 
+        //create new workout Div
         const newHtml = form._generateFormList(workout, true);
 
         //get old element

@@ -23,7 +23,7 @@ export function updateWorkoutData(workout) {
     oldWorkout.duration = workout.duration;
     oldWorkout.type = workout.type;
     oldWorkout.marker_description = workout.marker_description;
-    oldWorkout.description = workout.description;
+
     oldWorkout.date = workout.date;
     if (workout.type === 'running') oldWorkout.cadence = workout.cadence;
     if (workout.type === 'cycling') oldWorkout.speed = workout.speed;

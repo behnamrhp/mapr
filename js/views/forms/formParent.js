@@ -30,7 +30,7 @@ export class formParent extends mainParent {
      if(location.street !== '')html += location.street+ ' ';
      return html
     }
-    _setDescription(location) {
+    _setDescription(location = false) {
         // prettier-ignore
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} ${(location)? 'in '+this._renderLocationDetails(location.results[0].locations[0])  : ''} on ${months[this.date.getMonth()]} ${+this.date.getDay() + 1}`
