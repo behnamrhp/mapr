@@ -1,7 +1,7 @@
 import {ZOOM_LEVEL_MAP, FINISH_ICON_MARKER} from "../../config.js";
 import formParent from "../forms/formParent.js";
 import MainParent from "../mainParent.js";
-import {get_popup} from "../../helper.js";
+import {get_popup,__} from "../../helper.js";
 
 class Map extends MainParent {
     _globe = document.querySelector('.globe');
@@ -18,7 +18,7 @@ class Map extends MainParent {
     }
 
     _renderError() {
-        this._errorMessage = 'we couldn\'t find your location please try again later :(';
+        this._errorMessage = __('msg_map_error');
         this._alertRender('error');
     }
 

@@ -5,17 +5,14 @@ import {
     MAP_TYPE,
     ZOOM_LEVEL_MAP,
     DESCRIPTION_LENGTH_VALID,
-    UPDATE_SUCCESS_MESSAGE,
-    REMOVE_SUCCESS_MESSAGE,
-    CREATE_SUCCESS_MESSAGE,
 } from "./config.js";
-import form from "./views/forms/formParent.js"
+import form from "./views/forms/formParent.js";
+import language from "./views/language.js";
 import formParent from "./views/forms/formParent.js";
 import running from "./views/forms/running.js";
 import cycling from "./views/forms/cycling.js";
-import {updateWorkoutData} from "./model.js";
 import sort from './views/sort.js'
-import {get_line} from './helper.js'
+import {get_line,__,getLanguageFromUrl} from './helper.js'
 
 /**
  *
@@ -122,7 +119,7 @@ async function controlFormSubmit(e) {
         map.renderWorkoutMarker(workout);
         form._generateFormList(workout);
         //show message
-        form._successMessage = CREATE_SUCCESS_MESSAGE;
+        form._successMessage = __('msg_success');
 
         map._question = 'are you willing to set finish workout marker';
         map._alertRender('question');
@@ -137,6 +134,7 @@ async function controlFormSubmit(e) {
         workout.description = model.getWorkoutData(workout.id).description;
 
         //create new workout Div
+        form._weatherId = model.getWorkoutData(workout.id).weather_id;
         const newHtml = form._generateFormList(workout, true);
 
         //get old element
@@ -154,7 +152,7 @@ async function controlFormSubmit(e) {
         model.updateWorkoutData(workout)
 
         //show message
-        form._successMessage = UPDATE_SUCCESS_MESSAGE;
+        form._successMessage = __('msg_update');
 
         //hide form
         form._hideForm();
@@ -264,7 +262,7 @@ function ControlRemoveWorkout(e) {
     model.removeWorkoutData(workout_id)//remove from localstorage
 
     //show message
-    form._successMessage = REMOVE_SUCCESS_MESSAGE;
+    form._successMessage = __('msg_remove');
     form._alertRender('success')
 
     form._hideForm();
@@ -353,20 +351,65 @@ function controlAddClickCancelFinishMarkerWorkoutHandler(e) {
 }
 
 /**
+ *
+ * @param e {Object} event of click on language container
+ * @return get language and reload the page to new language
+ */
+function controlAddClickLanguageHandle(e){
+    const btn = e.target.closest('.language__item');
+    if (!btn) return;
+
+    //get lang type
+    const lang = btn.dataset.lang;
+
+    //reload page to lang
+    location.assign(window.location.href.split('?')[0] + '?lang=' + lang);
+}
+
+
+function controlInitLanguageLoadApp(){
+    //show reload layer
+
+    //get language type
+    let language_type =  getLanguageFromUrl();
+    if (language_type === null ) language_type ='en';
+    //set lang data type
+    language._lang = language_type;
+    model.state.language.type = language_type;
+
+    //change language btn
+    language._languageBtnSelectedChange()
+
+    //direction change
+    language._addRtl();
+
+    //get all translatable elements
+    const translatableElements = language.getTranslatableEl();
+
+    //change all element text
+    model.__a(translatableElements,language_type);
+
+    //hide reload layer
+}
+
+
+/**
  * @return control and introduce init functions
  */
 function init() {
     ControlMapInitData();
     controlWorkoutInit();
-    form.addChangeInputHandler(controlChangeInputHandler)
-    form.addClickWorkoutListHandler(controlClickWorkoutHandler)
+    language._addInitLanguageEvent(controlInitLanguageLoadApp);
+    form.addChangeInputHandler(controlChangeInputHandler);
+    form.addClickWorkoutListHandler(controlClickWorkoutHandler);
     form.addEventFomSubmitHandler(controlFormSubmit);
     form.addRemoveEventHandler(ControlRemoveWorkout);
     form.addTextareaEventHandler(controlTextareaDescription);
     form.addEditEventHandler(controlEditWorkoutHandler);
     sort.addClickEventHandler(controlSortClickHandler);
     map.addClickShowAllWorkoutsMarkerHandler(controlClickShowAllWorkoutsMarker);
-    map.addClickCancelFinishMarkerWorkoutEvent(controlAddClickCancelFinishMarkerWorkoutHandler)
+    map.addClickCancelFinishMarkerWorkoutEvent(controlAddClickCancelFinishMarkerWorkoutHandler);
+    language._addClickLangEvent(controlAddClickLanguageHandle);
 }
 
 init();

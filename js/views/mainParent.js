@@ -1,5 +1,6 @@
 import {hide_after_seconds} from '../helper.js'
 import {HIDE_MESSAGES_TIMEOUT} from '../config.js'
+import  {__} from '../helper.js'
 
 export default class MainParent {
     _map;
@@ -10,11 +11,13 @@ export default class MainParent {
     _errorElem = document.querySelector('.messages');
     _question ='';
     _weatherId;
+    _lang='en'
 
     updateDom(oldElem, newElemString) {
         const newDom = document.createRange().createContextualFragment(newElemString);
         const newDomArr = Array.from(newDom.querySelectorAll('*')).slice(1);
         const currDomArr = Array.from(oldElem.querySelectorAll('*'));
+
         newDomArr.forEach((newElem, i) => {
             const currElem = currDomArr[i];
 
@@ -63,7 +66,7 @@ export default class MainParent {
     _generateErrorAlert() {
         return `
         <i class="fal fa-times messages__icon messages__error"></i>
-    <div class="messages__type messages__error">Error</div>
+    <div class="messages__type messages__error">${__('Error')}</div>
     <div class="messages__description">${this._errorMessage}</div>
         `
     }

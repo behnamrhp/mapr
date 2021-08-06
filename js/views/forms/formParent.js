@@ -1,7 +1,7 @@
 import mainParent from "../mainParent.js";
-import {check_positive_numbers, check_valid_numbers} from "../../helper.js";
-import {REMOVE_SUCCESS_MESSAGE, ERROR_INVALID_INPUT, WEATHERS} from '../../config.js'
-
+import {check_positive_numbers, check_valid_numbers,__, getLanguageFromUrl} from "../../helper.js";
+import {REMOVE_SUCCESS_MESSAGE, ERROR_INVALID_INPUT, WEATHERS,GREGORIAN_MONTH} from '../../config.js'
+import * as model from "../../model.js"
 // import { v4 as uuidv4 } from 'uuid';
 
 
@@ -24,16 +24,22 @@ export class formParent extends mainParent {
 
     _renderLocationDetails(location){
         let html='';
-     if(location.adminArea3 !== '') html += location.adminArea3+', ';
-     if(location.adminArea4 !== '')html += location.adminArea4+', ';
-     if(location.adminArea5 !== '')html += location.adminArea5+', ';
-     if(location.street !== '')html += location.street+ ' ';
+     if(location.adminArea3 !== '') html += __(location.adminArea3)+', ';
+     if(location.adminArea4 !== '')html += __(location.adminArea4)+', ';
+     if(location.adminArea5 !== '')html += __(location.adminArea5)+', ';
+     if(location.street !== '')html += __(location.street)+ ' ';
      return html
     }
+    _getTimeForDescription(date){
+
+    }
     _setDescription(location = false) {
-        // prettier-ignore
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} ${(location)? 'in '+this._renderLocationDetails(location.results[0].locations[0])  : ''} on ${months[this.date.getMonth()]} ${+this.date.getDay() + 1}`
+        if (getLanguageFromUrl() === 'fa'){
+            console.log(this._data.type.toLowerCase())
+            return `${ __(this._data.type.toLowerCase()) } ${(location)? 'در '+this._renderLocationDetails(location.results[0].locations[0])  : ''} در ${Intl.DateTimeFormat('fa',{dateStyle:'full',calendar:'persian'}).format(Date.now()).split(',')[0].split(' ')[2]} ${Intl.DateTimeFormat('fa',{dateStyle:'full',calendar:'persian'}).format(Date.now()).split(',')[0].split(' ')[1]}`
+        }
+
+        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} ${(location)? 'in '+this._renderLocationDetails(location.results[0].locations[0])  : ''} on ${GREGORIAN_MONTH[Intl.DateTimeFormat('fa').format(this.date.getMonth())]} ${+this.date.getDay() + 1}`
     }
 
     showForm(e, updateCheck = 'false') {
@@ -68,11 +74,10 @@ export class formParent extends mainParent {
             duration: duration,
             type: type,
             date: this.date.toISOString(),
-            marker_description: (marker_description) ? marker_description : 'workout'
+            marker_description: (marker_description) ? marker_description : __('workout')
         }
         if (this._mapEvent && this._mapEvent.latlng) {
             const {lat, lng} = this._mapEvent.latlng;
-            console.log(this._mapEvent)
             this._data.coords = [lat, lng];
             this._data.id = new Date().getTime();
         }
@@ -89,7 +94,7 @@ export class formParent extends mainParent {
                 !check_valid_numbers(distance, duration, cadence) ||
                 !check_positive_numbers(distance, duration, cadence)
             ) {
-                this._errorMessage = ERROR_INVALID_INPUT;
+                this._errorMessage = __("msg_error");
                 this._isSubmit = false;
                  this._alertRender('error');
                  return false;
@@ -104,7 +109,7 @@ export class formParent extends mainParent {
                 !check_valid_numbers(distance, duration, elevation) ||
                 !check_positive_numbers(distance, duration)
             ) {
-                this._errorMessage = ERROR_INVALID_INPUT;
+                this._errorMessage = __("msg_error");
                 this._isSubmit = false;
                 this._alertRender('error');
                 return false;
@@ -158,10 +163,9 @@ export class formParent extends mainParent {
         let html = `<li class="workout workout--${workout.type}" data-id="${workout.id}">
            <i class="far fa-map-marker-times workout__remove workout__icons"></i>
             <i class="far fa-map-marker-edit workout__edit workout__icons"></i>`
-
         if (this._weatherId) html += `<span class="workout__weather">${this._generateWeather()}</span>`;
 
-        html += `<h2 class="workout__title" ${this._weatherId? 'style=margin-left:.8rem' :''}>${workout.description}</h2>
+        html += `<h2 class="workout__title" ${this._weatherId? 'style="margin-left:.8rem; margin-right:.8rem"' :''}>${workout.description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${workout.type === 'running' ? '🏃' : '‍♂'}</span>
             <span class="workout__value">${workout.distance}</span>
@@ -183,6 +187,13 @@ export class formParent extends mainParent {
 
         if (updateCheck) return html;
         this._parentEl.insertAdjacentHTML('afterend', html);
+    }
+
+    getWorkout(id) {
+        const workoutArr = this._containerWorkouts.querySelectorAll('.workout')
+        const workout = Array.from(workoutArr).find(workout => +workout.dataset.id === +id)
+        return workout
+
     }
 
     _hideForm() {
@@ -207,14 +218,7 @@ export class formParent extends mainParent {
         this._containerWorkouts.addEventListener('click', handler)
     }
 
-    getWorkout(id) {
-        const workout = this._containerWorkouts.querySelectorAll('.workout')
 
-        for (let i = 0; i < workout.length; i++) {
-            if (+workout[i].dataset.id === +id) return workout[i]
-        }
-
-    }
 
     _formEmptyInputs() {
         this._inputDistance.value = '';

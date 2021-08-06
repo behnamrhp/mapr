@@ -23,3 +23,4 @@ export const WEATHERS = {
     clear: `<i class="fad fa-sun"></i>`,
     cloud: `<i class="fad fa-cloud-sun"></i>`
 }
+export const GREGORIAN_MONTH = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
