@@ -20,7 +20,18 @@
     <script defer type="module" src="js/controller.js"></script>
     <title data-t="0">mapr // Map your workouts</title>
 </head>
-<body>
+<body >
+<!---loading start--->
+<div class="loading">
+    <img src="images/clouds/cloud%20(1).png" alt="cloud" class="cloud" id="cloud1">
+    <img src="images/clouds/cloud%20(2).png" alt="cloud" class="cloud" id="cloud2">
+    <img src="images/clouds/cloud%20(3).png" alt="cloud" class="cloud" id="cloud3">
+    <img src="images/clouds/cloud%20(4).png" alt="cloud" class="cloud" id="cloud4">
+    <img src="images/clouds/cloud%20(5).png" alt="cloud" class="cloud" id="cloud5">
+    <img src="images/clouds/cloud%20(6).png" alt="cloud" class="cloud" id="cloud6">
+    <img src="images/clouds/cloud%20(7).png" alt="cloud" class="cloud" id="cloud7">
+</div>
+<!---loading end--->
 <a href="javascript:void(0)" data-t="1" class="cancel__finishMarker btn--cancel hidden">cancel</a>
 <div class="messages messages__border-error hidden">
     <i class="fal fa-times messages__icon messages__error"></i>
@@ -39,7 +50,7 @@
     </div>
     <!---language end--->
 
-    <img src="logo.png" alt="Logo" class="logo"/>
+    <img src="images/main_icon.png" alt="Logo" class="logo"/>
     <!------sort start----->
     <div class="sort">
         <a href="javascript:void(0)" class="sort__btn sort__duration" data-sort="duration" data-t="3">duration</a>
@@ -92,17 +103,16 @@
 
     </ul>
 
-<!--    <p class="copyright" data-t="14">-->
-<!--        &copy; Copyright by-->
-<!--        <a-->
-<!--                class="twitter-link"-->
-<!--                target="_blank"-->
-<!--                href="https://twitter.com/jonasschmedtman"-->
-<!--                data-t="15"-->
-<!--         >Jonas Schmedtmann</a-->
-<!--        >. Use for learning or your portfolio. Don't use to teach. Don't claim-->
-<!--        as your own.-->
-<!--    </p>-->
+    <p class="copyright" data-t="14">
+        &copy; Developed by
+        <a
+                class="social-link"
+                target="_blank"
+                href="https://www.linkedin.com/in/behnam-rahimpour-18b13a210/"
+                data-t="15"
+         > </a
+        >
+    </p>
 </div>
 
 <div id="map"></div>

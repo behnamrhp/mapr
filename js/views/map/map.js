@@ -1,12 +1,13 @@
 import {ZOOM_LEVEL_MAP, FINISH_ICON_MARKER} from "../../config.js";
 import formParent from "../forms/formParent.js";
 import MainParent from "../mainParent.js";
-import {get_popup,__} from "../../helper.js";
+import {get_popup,__,showHideLoading} from "../../helper.js";
 
 class Map extends MainParent {
     _globe = document.querySelector('.globe');
     _finishMarkerCheck = false;
     _cancelFinishMarkerBtn = document.querySelector('.cancel__finishMarker');
+    _checkMapLoaded = false;
     constructor() {
         super();
         this.initFunctions();

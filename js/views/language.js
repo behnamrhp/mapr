@@ -2,6 +2,7 @@ import mainParent from "./mainParent.js";
 
 class language extends mainParent {
     _parentEl = document.querySelector('.language');
+    _checkInitLangLoaded = false
 
     _addClickLangEvent(handler) {
         this._parentEl.addEventListener('click', handler)

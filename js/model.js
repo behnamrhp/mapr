@@ -76,12 +76,12 @@ export const state = {
             },
             {
                 key: 'copy_right',
-                en: '',
-                fa: ''
+                en: 'developed by',
+                fa: 'توسعه داده شده توسط '
             },
             {
                 key: 'copy_right_name',
-                en: 'behnam rahimpour',
+                en: ' behnam rahimpour',
                 fa: ' بهنام رحیم پور'
             },
             {
@@ -94,6 +94,12 @@ export const state = {
                 en: 'Running',
                 fa: 'دویدن'
             },
+            {
+                key: 'cycling',
+                en: 'Cycling',
+                fa: 'دوچرخه سواری'
+            },
+
             {
                 key: 'isfahan',
                 en: 'Isfahan',

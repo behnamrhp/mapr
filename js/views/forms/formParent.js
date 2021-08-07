@@ -39,7 +39,7 @@ export class formParent extends mainParent {
             return `${ __(this._data.type.toLowerCase()) } ${(location)? 'در '+this._renderLocationDetails(location.results[0].locations[0])  : ''} در ${Intl.DateTimeFormat('fa',{dateStyle:'full',calendar:'persian'}).format(Date.now()).split(',')[0].split(' ')[2]} ${Intl.DateTimeFormat('fa',{dateStyle:'full',calendar:'persian'}).format(Date.now()).split(',')[0].split(' ')[1]}`
         }
 
-        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} ${(location)? 'in '+this._renderLocationDetails(location.results[0].locations[0])  : ''} on ${GREGORIAN_MONTH[Intl.DateTimeFormat('fa').format(this.date.getMonth())]} ${+this.date.getDay() + 1}`
+        return `${this._data.type[0].toUpperCase()}${this._data.type.slice(1)} ${(location)? 'in '+this._renderLocationDetails(location.results[0].locations[0])  : ''} on ${GREGORIAN_MONTH[this.date.getMonth()]} ${+this.date.getDay() + 1}`
     }
 
     showForm(e, updateCheck = 'false') {

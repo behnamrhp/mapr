@@ -12,7 +12,7 @@ import formParent from "./views/forms/formParent.js";
 import running from "./views/forms/running.js";
 import cycling from "./views/forms/cycling.js";
 import sort from './views/sort.js'
-import {get_line,__,getLanguageFromUrl} from './helper.js'
+import {get_line,__,showHideLoading,getLanguageFromUrl} from './helper.js'
 
 /**
  *
@@ -60,8 +60,10 @@ function controlMap(position) {
         }
     }
 
-    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form))
-
+    map.addClickMapHandler(map._finishMarkerCheck ? controlAddFinishMarker : form.showForm.bind(form));
+    //hide reload layer
+    map._checkMapLoaded = true;
+    if (language._checkInitLangLoaded) showHideLoading();
 }
 
 
@@ -311,6 +313,9 @@ function controlTextareaDescription(e) {
 function controlSortClickHandler(e) {
     const btn = e.target.closest('.sort__btn');
     if (!btn) return;
+    //set chosen style to btn
+    sort.setSelectedSortItem(btn)
+
     //get sort type
     const sortType = btn.dataset.sort;
 
@@ -368,7 +373,7 @@ function controlAddClickLanguageHandle(e){
 
 
 function controlInitLanguageLoadApp(){
-    //show reload layer
+
 
     //get language type
     let language_type =  getLanguageFromUrl();
@@ -389,7 +394,10 @@ function controlInitLanguageLoadApp(){
     //change all element text
     model.__a(translatableElements,language_type);
 
+
     //hide reload layer
+    language._checkInitLangLoaded = true;
+    if (map._checkMapLoaded) showHideLoading();
 }
 
 
@@ -397,6 +405,7 @@ function controlInitLanguageLoadApp(){
  * @return control and introduce init functions
  */
 function init() {
+
     ControlMapInitData();
     controlWorkoutInit();
     language._addInitLanguageEvent(controlInitLanguageLoadApp);

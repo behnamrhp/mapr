@@ -37,3 +37,16 @@ export function __(key) {
 
     return translate
 }
+export function showHideLoading(){
+    setTimeout(()=>{
+        document.querySelectorAll('.cloud').forEach(cloud =>{
+            if (+cloud.getAttribute('id').slice(-1) <= 4) cloud.classList.toggle('hideCloud')
+            if (+cloud.getAttribute('id').slice(-1) > 4) cloud.classList.toggle('hideCloudLeft')
+        })
+
+
+        document.querySelector('.loading').classList.toggle('hidden')
+    },1000)
+
+
+}

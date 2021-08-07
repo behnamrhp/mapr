@@ -1,6 +1,6 @@
 import {hide_after_seconds} from '../helper.js'
 import {HIDE_MESSAGES_TIMEOUT} from '../config.js'
-import  {__} from '../helper.js'
+import  {__,showHideLoading} from '../helper.js'
 
 export default class MainParent {
     _map;
@@ -12,6 +12,8 @@ export default class MainParent {
     _question ='';
     _weatherId;
     _lang='en'
+
+
 
     updateDom(oldElem, newElemString) {
         const newDom = document.createRange().createContextualFragment(newElemString);
