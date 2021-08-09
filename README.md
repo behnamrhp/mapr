@@ -14,7 +14,7 @@
 
 **architecture**:
 
-            this front app used mvc architecture to devope and flowchart and architecture design exist in this repo
+            this front app used mvc architecture to develope and flowchart and architecture design exist in this repo
 
 **design**: 
 
