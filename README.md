@@ -12,6 +12,31 @@
 
         this is small multi language app for mappin your workout and manage them developed by behnam rahimpour (based design is for jonas schmedtmann)
 
+**traits**:
+
+             1. add and see workouts in a list and map        
+
+            2. add final workout place on map
+            
+            3. see all the practice at once
+            
+            4. multi language (en - fa)
+            
+            5. see weather in time of adding workout on map
+            
+            6. see name of location that workout started on map
+            
+            7. place workout description on map
+            
+            8. place description of workout depend on language
+            
+            9. show workout place on map by click on every workout on list
+            
+            10. add or remove workout
+           
+            
+
+
 **architecture**:
 
             this front app used mvc architecture to develope and flowchart and architecture design exist in this repo
